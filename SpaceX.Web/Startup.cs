@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Serilog;
+using SpaceX.Library.Api.LaunchPad;
+using SpaceX.Library.Settings;
+using System.IO;
 
 namespace SpaceX.Web
 {
@@ -25,12 +23,26 @@ namespace SpaceX.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<AppSettings>(con => Configuration.GetSection("AppSettings").Bind(con));
+            var appSettings = Configuration.GetValue<int>("AppSettings:SpaceXApiVersion");
+            services.Add(new ServiceDescriptor(typeof(ILaunchPadService), new LaunchPadService(appSettings)));
+            services.AddTransient<ILaunchPadManager, LaunchPadManager>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory,
+            ILaunchPadService launch)
         {
+            Log.Logger = new LoggerConfiguration()
+      .MinimumLevel.Debug()
+      .WriteTo.RollingFile(Path.Combine(env.WebRootPath, "log-{Date}.txt"))
+      .CreateLogger();
+
+            loggerFactory.AddSerilog();
+
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

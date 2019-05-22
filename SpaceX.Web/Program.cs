@@ -7,6 +7,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Serilog.Extensions.Logging;
 
 namespace SpaceX.Web
 {
@@ -19,6 +20,10 @@ namespace SpaceX.Web
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+             .ConfigureLogging((hostingContext, builder) =>
+             {
+                builder.AddFile("Logs/spacex-{Date}.txt");
+             })
                 .UseStartup<Startup>();
     }
 }
