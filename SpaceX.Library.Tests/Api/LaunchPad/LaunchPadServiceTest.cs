@@ -8,25 +8,7 @@ namespace SpaceX.Library.Tests.Api.LaunchPad
     public class LaunchPadServiceTest
     {
         //TODO: Add Mock Tests
-        [TestCategory("Mock")]
-        [TestMethod]
-        [DataRow(2, 2)]
-        public void TestGetPadMock(int version, int id)
-        {
-            //TODO: didn't get totally working.
-
-            //var mockery = new MockFactory();
-            //var launchService = mockery.CreateMock<ILaunchPadManager>();
-
-            //Expect.On<ILaunchPadManager>(launchService.MockObject).AtLeastOne
-            //    .MethodWith(x => x.GetPad(id))
-            //    .WillReturn(new PadModel() { PadId = id });
-
-            //LaunchPadService service = new LaunchPadService(version);
-            //var pad = service.GetPad(id);
-
-            //Assert.IsTrue(pad.PadId == id, JsonConvert.SerializeObject(pad));
-        }
+        
 
         /// <summary>
         /// tests get pads from the api for v2 and 3

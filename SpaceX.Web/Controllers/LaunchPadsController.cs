@@ -4,12 +4,16 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SpaceX.Library.Api.LaunchPad;
 using SpaceX.Library.Settings;
+using SpaceX.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SpaceX.Web.Controllers
 {
+    /// <summary>
+    /// launch pad controller for the api.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class LaunchPadsController : ControllerBase
@@ -32,22 +36,32 @@ namespace SpaceX.Web.Controllers
 
 
         //TODO: AUTHORIZE ATTRIBUTE
+        /// <summary>
+        /// gets all the launch pads within the system.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult<string> Get()
         {
+            ResponseListModel model = new ResponseListModel();
             try
             {
                 _log.LogInformation("Get All Launch Pads " + _appSettings.SpaceXApiVersion);
 
                 List<PadModel> pads = _manager.GetPads();
 
-                return JsonConvert.SerializeObject(pads.Select(x => new { x.Id, x.Name, x.Status }).ToList());
+                model.IsSuccess = true;
+                model.Items = pads.Select(x => new LaunchPadModel { Id = x.Id, Name = x.Name, Status = x.Status }).Cast<object>().ToList();
 
+                return JsonConvert.SerializeObject(model);
             }
             catch (Exception exception)
             {
-                _log.LogError(exception, "Get All Error ");
-                return "Error: Exception occurred, Error Logged. " + exception.Message;
+                _log.LogError(exception, "Get All launch pads Error ");
+                model.IsSuccess = false;
+                model.Message = "Error: Exception occurred, Error Logged. " + exception.Message;
+
+                return JsonConvert.SerializeObject(model);
             }
 
         }
@@ -57,23 +71,32 @@ namespace SpaceX.Web.Controllers
         [HttpGet("{id}")]
         public ActionResult<string> Get(int id)
         {
+            ResponseModel model = new ResponseModel();
             try
             {
                 if (id == 0)
-                    return "Error: Id needs to be larger than 0";
-
+                {
+                    model.IsSuccess = false;
+                    model.Message = "Error: Id needs to be larger than 0";
+                    return JsonConvert.SerializeObject(model);
+                }
                 _log.LogInformation("Get Launch Pads " + id);
                 PadModel pad = _manager.GetPad(id);
 
-                dynamic dynPad = new { pad.Id, pad.Name, pad.Status };
+                model.IsSuccess = true;
+                model.Item = new LaunchPadModel(pad.Id, pad.Name, pad.Status) as object;
 
                 _log.LogInformation("GOT Launch Pads " + id);
-                return JsonConvert.SerializeObject(dynPad);
+
+                return JsonConvert.SerializeObject(model);
             }
             catch (Exception exception)
             {
                 _log.LogError(exception, "Get Error: " + id);
-                return "Error: Exception occurred, Error Logged. " + exception.Message;
+                model.IsSuccess = false;
+                model.Message = "Error: Exception occurred, Error Logged. " + exception.Message;
+
+                return JsonConvert.SerializeObject(model);
             }
 
 

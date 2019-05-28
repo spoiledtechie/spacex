@@ -5,6 +5,9 @@ using System.Net;
 
 namespace SpaceX.Library.Api.LaunchPad
 {
+    /// <summary>
+    /// launch pad service that reaches back to spacex.
+    /// </summary>
     public class LaunchPadService : ILaunchPadService
     {
         string _padsApiUrl = "https://api.spacexdata.com/v{0}/launchpads";
@@ -18,7 +21,10 @@ namespace SpaceX.Library.Api.LaunchPad
         {
             _version = version;
         }
-
+        /// <summary>
+        /// gets all the pads from the api
+        /// </summary>
+        /// <returns></returns>
         public List<PadModel> GetPads()
         {
             var webClient = new WebClient();
@@ -27,7 +33,11 @@ namespace SpaceX.Library.Api.LaunchPad
 
             return pads;
         }
-
+        /// <summary>
+        /// gets 1 pad from the api.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public PadModel GetPad(int id)
         {
             var pads = GetPads();

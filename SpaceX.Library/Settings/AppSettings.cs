@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SpaceX.Library.Settings
+﻿namespace SpaceX.Library.Settings
 {
-  public   class AppSettings
+    /// <summary>
+    /// app settings.
+    /// </summary>
+    public class AppSettings
     {
+        /// <summary>
+        /// space x api version for the launch pad.  V1, V2, V3
+        /// </summary>
         public int SpaceXApiVersion { get; set; }
     }
 }

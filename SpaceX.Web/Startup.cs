@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using SpaceX.Library.Api.LaunchPad;
 using SpaceX.Library.Settings;
-using System.IO;
 
 namespace SpaceX.Web
 {
@@ -25,7 +24,11 @@ namespace SpaceX.Web
         {
             services.Configure<AppSettings>(con => Configuration.GetSection("AppSettings").Bind(con));
             var appSettings = Configuration.GetValue<int>("AppSettings:SpaceXApiVersion");
+
+            //adds the launch pad service.
+            //can be traded out with the repository here when the api moves to a database version.
             services.Add(new ServiceDescriptor(typeof(ILaunchPadService), new LaunchPadService(appSettings)));
+            //adds the rest of the IOC managers.
             services.AddTransient<ILaunchPadManager, LaunchPadManager>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -35,14 +38,10 @@ namespace SpaceX.Web
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory,
             ILaunchPadService launch)
         {
-            Log.Logger = new LoggerConfiguration()
-      .MinimumLevel.Debug()
-      .WriteTo.RollingFile(Path.Combine(env.WebRootPath, "log-{Date}.txt"))
-      .CreateLogger();
 
+            //creates logger.
             loggerFactory.AddSerilog();
-
-
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
